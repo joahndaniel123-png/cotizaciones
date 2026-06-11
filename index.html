@@ -11,7 +11,6 @@
         input, button, select { font-size: 16px; }
         .oculto { display: none; }
         .item-cotizacion { transition: all 0.3s ease; }
-        /* Estilos específicos para que se vea perfecto */
         .plantilla-pdf {
             font-family: 'Arial', sans-serif;
             color: #2d3748;
@@ -44,9 +43,7 @@
 </head>
 <body class="bg-gray-50 p-3 md:p-4">
 
-    <!-- ==============================================
-        📋 CONFIGURACIÓN GENERAL
-    ============================================== -->
+    <!-- CONFIGURACIÓN -->
     <script>
         const USUARIOS = [
             { usuario: "admin", clave: "admin123", nombre: "Administrador", rol: "administrador" },
@@ -71,38 +68,28 @@
         let numeroCotizacion = 1;
     </script>
 
-    <!-- ==============================================
-        🔐 PANTALLA DE INICIO DE SESIÓN
-    ============================================== -->
+    <!-- PANTALLA LOGIN -->
     <div id="pantallaLogin" class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-16">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-bold text-blue-800">Cotizador CLC</h2>
             <p class="text-gray-600 mt-2">Acceso al sistema</p>
         </div>
-
         <div class="mb-5">
             <label class="block text-gray-700 mb-2 font-medium">Usuario</label>
-            <input type="text" id="usuario" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ingrese su usuario">
+            <input type="text" id="usuario" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ingrese su usuario">
         </div>
-
         <div class="mb-6">
             <label class="block text-gray-700 mb-2 font-medium">Contraseña</label>
-            <input type="password" id="clave" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Ingrese su contraseña">
+            <input type="password" id="clave" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ingrese su contraseña">
         </div>
-
-        <button onclick="iniciarSesion()" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold transition duration-300 shadow-md hover:shadow-lg">
-            Ingresar al Sistema
-        </button>
-
+        <button onclick="iniciarSesion()" class="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded-lg font-semibold shadow-md">Ingresar al Sistema</button>
         <p id="mensajeError" class="text-red-500 text-center mt-4 oculto bg-red-50 p-2 rounded">Usuario o contraseña incorrectos</p>
     </div>
 
-    <!-- ==============================================
-        📄 PANTALLA PRINCIPAL Y PLANTILLA
-    ============================================== -->
+    <!-- PANTALLA PRINCIPAL -->
     <div id="pantallaPrincipal" class="max-w-5xl mx-auto oculto">
 
-        <!-- Panel de herramientas -->
+        <!-- PANEL DE CONFIGURACIÓN -->
         <div class="bg-white p-5 rounded-xl shadow-md mb-6 border-l-4 border-blue-700">
             <h3 class="font-semibold text-gray-800 mb-3">Configuración</h3>
             <div class="flex flex-wrap gap-6 items-center">
@@ -110,6 +97,7 @@
                     <label class="block text-sm text-gray-600 mb-1">Subir Logo:</label>
                     <input type="file" id="logoInput" accept="image/*" class="text-sm border p-1 rounded" onchange="cargarLogo(this)">
                 </div>
+                <!-- ✅ OPCIÓN IVA RESTAURADA -->
                 <div class="flex items-center">
                     <input type="checkbox" id="aplicarIVA" checked onchange="calcularTotales()" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                     <label class="ml-2 text-gray-700">Aplicar IVA (19%)</label>
@@ -121,7 +109,7 @@
         <!-- PLANTILLA DE COTIZACIÓN -->
         <div id="plantillaPDF" class="plantilla-pdf bg-white p-10 rounded-xl shadow-xl mb-8">
             
-            <!-- Encabezado -->
+            <!-- ENCABEZADO -->
             <div class="flex flex-col md:flex-row justify-between items-start mb-6">
                 <div class="flex items-center">
                     <img id="logoEmpresa" src="" alt="Logo" class="h-24 mr-6 object-contain">
@@ -142,7 +130,7 @@
 
             <div class="linea-divisoria mb-6"></div>
 
-            <!-- Datos del Cliente -->
+            <!-- DATOS DEL CLIENTE -->
             <div class="mb-8">
                 <h3 class="text-xl font-semibold text-blue-800 mb-4 pb-2 border-b border-gray-200">Datos del Cliente</h3>
                 <div class="grid md:grid-cols-2 gap-4">
@@ -169,7 +157,7 @@
                 </div>
             </div>
 
-            <!-- Tabla de Productos -->
+            <!-- TABLA DE PRODUCTOS -->
             <div class="mb-8">
                 <h3 class="text-xl font-semibold text-blue-800 mb-4 pb-2 border-b border-gray-200">Detalle de Productos y Servicios</h3>
                 <div class="overflow-x-auto">
@@ -186,14 +174,13 @@
                         <tbody id="listaItems"></tbody>
                     </table>
                 </div>
-                <!-- ✅ Botón agregar ítem -->
                 <button onclick="agregarItem()" class="mt-4 bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-md font-medium transition">
                     + Agregar otro ítem
                 </button>
                 <p id="mensajeSinItems" class="text-red-500 text-sm mt-2 oculto">⚠️ Agrega al menos un producto o servicio para generar la cotización</p>
             </div>
 
-            <!-- Totales -->
+            <!-- TOTALES (IVA SE MUESTRA/OCULTA) -->
             <div class="flex justify-end mb-8">
                 <div class="w-full md:w-1/2 bg-gray-50 p-6 rounded-lg border border-gray-200">
                     <div class="flex justify-between items-center py-2 border-b border-gray-300">
@@ -211,43 +198,39 @@
                 </div>
             </div>
 
-            <!-- Términos y Condiciones -->
+            <!-- TÉRMINOS -->
             <div class="mb-8">
                 <h3 class="text-xl font-semibold text-blue-800 mb-3 pb-2 border-b border-gray-200">Términos y Condiciones</h3>
-                <textarea id="observaciones" rows="5" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50" placeholder="Ingrese términos y condiciones...">• Vigencia de la cotización: 15 días hábiles a partir de la fecha de emisión.
+                <textarea id="observaciones" rows="5" class="w-full p-3 border border-gray-300 rounded-md bg-gray-50">• Vigencia de la cotización: 15 días hábiles a partir de la fecha de emisión.
 • Forma de pago: Contado o según acuerdo establecido previamente.
 • Precios expresados en Pesos Colombianos (COP).
 • Los precios pueden estar sujetos a cambios sin previo aviso.
 • La garantía aplica según las especificaciones del producto o servicio adquirido.</textarea>
             </div>
 
-            <!-- Pie de página -->
+            <!-- PIE DE PÁGINA -->
             <div class="mt-12 pt-6 border-t border-gray-300 text-center text-gray-500 text-sm italic">
                 Esta cotización es un documento válido para fines comerciales. <br>
                 Desarrollado por JD Tecnology © 2026
             </div>
         </div>
 
-        <!-- 📤 Botones de Exportación -->
+        <!-- BOTONES DE EXPORTACIÓN -->
         <div class="flex flex-wrap justify-center gap-4 mb-10">
-            <button id="btnPDF" onclick="generarPDF()" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md hover:shadow-lg transition">
+            <button id="btnPDF" onclick="generarPDF()" class="bg-blue-700 hover:bg-blue-800 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md">
                 📄 Exportar como PDF
             </button>
-            <button id="btnImagen" onclick="exportarComoImagen()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md hover:shadow-lg transition">
+            <button id="btnImagen" onclick="exportarComoImagen()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-semibold text-lg shadow-md">
                 🖼️ Exportar como Imagen
             </button>
-            <button onclick="nuevaCotizacion()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+            <button onclick="nuevaCotizacion()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold">
                 Nueva Cotización
             </button>
         </div>
-
     </div>
 
-    <!-- ==============================================
-        ⚙️ FUNCIONES DEL SISTEMA
-    ============================================== -->
+    <!-- FUNCIONES -->
     <script>
-        // Cargar logo desde archivo
         function cargarLogo(input) {
             if (input.files && input.files[0]) {
                 const reader = new FileReader();
@@ -259,12 +242,10 @@
             }
         }
 
-        // Iniciar sesión
         function iniciarSesion() {
             const usuario = document.getElementById('usuario').value.trim();
             const clave = document.getElementById('clave').value.trim();
             const error = document.getElementById('mensajeError');
-
             const usuarioEncontrado = USUARIOS.find(u => u.usuario === usuario && u.clave === clave);
             
             if (usuarioEncontrado) {
@@ -278,10 +259,8 @@
                 
                 actualizarFecha();
                 document.getElementById('numCotizacion').textContent = numeroCotizacion;
-                
                 document.getElementById('pantallaLogin').classList.add('oculto');
                 document.getElementById('pantallaPrincipal').classList.remove('oculto');
-                
                 agregarItem();
             } else {
                 error.classList.remove('oculto');
@@ -289,10 +268,8 @@
         }
 
         function cerrarSesion() {
-            usuarioActual = null;
-            empresaActual = null;
-            document.getElementById('usuario').value = '';
-            document.getElementById('clave').value = '';
+            usuarioActual = null; empresaActual = null;
+            document.getElementById('usuario').value = ''; document.getElementById('clave').value = '';
             document.getElementById('mensajeError').classList.add('oculto');
             document.getElementById('pantallaPrincipal').classList.add('oculto');
             document.getElementById('pantallaLogin').classList.remove('oculto');
@@ -304,25 +281,16 @@
             document.getElementById('fechaActual').textContent = fecha.toLocaleDateString('es-CO', opciones);
         }
 
-        // ✅ Agregar ítem
         function agregarItem() {
             const tbody = document.getElementById('listaItems');
             const fila = document.createElement('tr');
             fila.className = 'border-b hover:bg-gray-50';
             fila.innerHTML = `
-                <td class="py-3 px-4">
-                    <input type="text" class="w-full px-2 py-1 border rounded" placeholder="Descripción detallada">
-                </td>
-                <td class="py-3 px-4">
-                    <input type="number" min="1" value="1" class="w-full px-2 py-1 border rounded text-center" onchange="calcularTotales()">
-                </td>
-                <td class="py-3 px-4">
-                    <input type="number" min="0" value="0" class="w-full px-2 py-1 border rounded text-right" onchange="calcularTotales()">
-                </td>
+                <td class="py-3 px-4"><input type="text" class="w-full px-2 py-1 border rounded" placeholder="Descripción detallada"></td>
+                <td class="py-3 px-4"><input type="number" min="1" value="1" class="w-full px-2 py-1 border rounded text-center" onchange="calcularTotales()"></td>
+                <td class="py-3 px-4"><input type="number" min="0" value="0" class="w-full px-2 py-1 border rounded text-right" onchange="calcularTotales()"></td>
                 <td class="py-3 px-4 text-right font-semibold">$ 0</td>
-                <td class="py-3 px-4 text-center">
-                    <button onclick="eliminarItem(this)" class="text-red-600 hover:text-red-800 font-bold text-xl">×</button>
-                </td>
+                <td class="py-3 px-4 text-center"><button onclick="eliminarItem(this)" class="text-red-600 hover:text-red-800 font-bold text-xl">×</button></td>
             `;
             tbody.appendChild(fila);
             calcularTotales();
@@ -334,28 +302,26 @@
                 boton.closest('tr').remove();
                 calcularTotales();
             } else {
-                alert('Debe haber al menos un ítem en la cotización');
+                alert('Debe haber al menos un ítem');
             }
         }
 
+        // ✅ FUNCIÓN CON IVA FUNCIONANDO
         function calcularTotales() {
             let subtotal = 0;
             const ivaActivo = document.getElementById('aplicarIVA').checked;
-            let hayItemsConDatos = false;
+            let hayItemsValidos = false;
 
             document.querySelectorAll('#listaItems tr').forEach(fila => {
-                const descripcion = fila.children[0].querySelector('input').value.trim();
-                const cantidad = parseFloat(fila.children[1].querySelector('input').value) || 0;
-                const valorUnitario = parseFloat(fila.children[2].querySelector('input').value) || 0;
-                const total = cantidad * valorUnitario;
+                const desc = fila.children[0].querySelector('input').value.trim();
+                const cant = parseFloat(fila.children[1].querySelector('input').value) || 0;
+                const valor = parseFloat(fila.children[2].querySelector('input').value) || 0;
+                const total = cant * valor;
                 
                 fila.children[3].textContent = `$ ${total.toLocaleString('es-CO')}`;
                 subtotal += total;
 
-                // Verificar si al menos un ítem tiene información
-                if (descripcion !== '' && cantidad > 0 && valorUnitario > 0) {
-                    hayItemsConDatos = true;
-                }
+                if (desc && cant > 0 && valor > 0) hayItemsValidos = true;
             });
 
             const iva = ivaActivo ? subtotal * 0.19 : 0;
@@ -363,6 +329,7 @@
 
             document.getElementById('subtotal').textContent = `$ ${subtotal.toLocaleString('es-CO')}`;
             
+            // Mostrar u ocultar fila de IVA
             if (ivaActivo) {
                 document.getElementById('filaIVA').classList.remove('oculto');
                 document.getElementById('iva').textContent = `$ ${iva.toLocaleString('es-CO')}`;
@@ -372,87 +339,54 @@
 
             document.getElementById('total').textContent = `$ ${totalFinal.toLocaleString('es-CO')}`;
 
-            // ✅ Control de botones: activar/desactivar según haya ítems
+            // Control de botones
             const btnPDF = document.getElementById('btnPDF');
             const btnImagen = document.getElementById('btnImagen');
             const mensaje = document.getElementById('mensajeSinItems');
 
-            if (hayItemsConDatos) {
-                btnPDF.classList.remove('boton-desactivado');
-                btnImagen.classList.remove('boton-desactivado');
-                btnPDF.disabled = false;
-                btnImagen.disabled = false;
-                mensaje.classList.add('oculto');
+            if (hayItemsValidos) {
+                btnPDF.classList.remove('boton-desactivado'); btnImagen.classList.remove('boton-desactivado');
+                btnPDF.disabled = false; btnImagen.disabled = false; mensaje.classList.add('oculto');
             } else {
-                btnPDF.classList.add('boton-desactivado');
-                btnImagen.classList.add('boton-desactivado');
-                btnPDF.disabled = true;
-                btnImagen.disabled = true;
-                mensaje.classList.remove('oculto');
+                btnPDF.classList.add('boton-desactivado'); btnImagen.classList.add('boton-desactivado');
+                btnPDF.disabled = true; btnImagen.disabled = true; mensaje.classList.remove('oculto');
             }
         }
 
-        // Exportar como PDF con validación
         async function generarPDF() {
             if (document.getElementById('btnPDF').disabled) {
-                alert('❌ No puedes generar la cotización: agrega al menos un producto o servicio con sus datos.');
+                alert('❌ Agrega al menos un producto con datos para generar');
                 return;
             }
-
             const { jsPDF } = window.jspdf;
-            const elemento = document.getElementById('plantillaPDF');
-            
-            const canvas = await html2canvas(elemento, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-            
+            const elem = document.getElementById('plantillaPDF');
+            const canvas = await html2canvas(elem, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4'
-            });
-            
-            const imgWidth = 210;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            pdf.save(`Cotizacion_N${numeroCotizacion}_CLC_Soluciones.pdf`);
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const ancho = 210; const alto = (canvas.height * ancho) / canvas.width;
+            pdf.addImage(imgData, 'PNG', 0, 0, ancho, alto);
+            pdf.save(`Cotizacion_N${numeroCotizacion}_CLC.pdf`);
         }
 
-        // Exportar como Imagen con validación
         async function exportarComoImagen() {
             if (document.getElementById('btnImagen').disabled) {
-                alert('❌ No puedes generar la cotización: agrega al menos un producto o servicio con sus datos.');
+                alert('❌ Agrega al menos un producto con datos para generar');
                 return;
             }
-
-            const elemento = document.getElementById('plantillaPDF');
-            
-            const canvas = await html2canvas(elemento, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-            });
-            
+            const elem = document.getElementById('plantillaPDF');
+            const canvas = await html2canvas(elem, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
             const enlace = document.createElement('a');
-            enlace.download = `Cotizacion_N${numeroCotizacion}_CLC_Soluciones.png`;
+            enlace.download = `Cotizacion_N${numeroCotizacion}_CLC.png`;
             enlace.href = canvas.toDataURL('image/png');
             enlace.click();
         }
 
         function nuevaCotizacion() {
-            if (confirm('¿Desea crear una nueva cotización? Se borrarán los datos actuales.')) {
+            if (confirm('¿Crear nueva cotización? Se borrarán los datos actuales.')) {
                 numeroCotizacion++;
                 document.getElementById('numCotizacion').textContent = numeroCotizacion;
-                document.getElementById('clienteNombre').value = '';
-                document.getElementById('clienteDocumento').value = '';
-                document.getElementById('clienteTelefono').value = '';
-                document.getElementById('clienteCorreo').value = '';
+                document.getElementById('clienteNombre').value = ''; document.getElementById('clienteDocumento').value = '';
+                document.getElementById('clienteTelefono').value = ''; document.getElementById('clienteCorreo').value = '';
                 document.getElementById('clienteDireccion').value = '';
                 document.getElementById('observaciones').value = '• Vigencia de la cotización: 15 días hábiles a partir de la fecha de emisión.\n• Forma de pago: Contado o según acuerdo establecido previamente.\n• Precios expresados en Pesos Colombianos (COP).\n• Los precios pueden estar sujetos a cambios sin previo aviso.\n• La garantía aplica según las especificaciones del producto o servicio adquirido.';
                 document.getElementById('listaItems').innerHTML = '';
