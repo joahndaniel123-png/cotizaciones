@@ -11,6 +11,7 @@
         input, button, select { font-size: 16px; }
         .oculto { display: none; }
         .item-cotizacion { transition: all 0.3s ease; }
+        .pdf-estilo { font-family: Arial, sans-serif; }
     </style>
 </head>
 <body class="bg-gray-50 p-3 md:p-4">
@@ -19,7 +20,7 @@
         📋 CONFIGURACIÓN GENERAL
     ============================================== -->
     <script>
-        // 👤 USUARIOS
+        // 👤 USUARIOS CORREGIDOS
         const USUARIOS = [
             {
                 usuario: "admin",
@@ -42,18 +43,18 @@
                 id: "empresa_clc",
                 nombre: "C.L.C SOLUCIONES",
                 nit: "En proceso",
-                direccion: "Bogotá D.C",
+                direccion: "Bogotá D.C, Colombia",
                 telefono: "321 485 0369",
                 correo: "cesarcarreno200896@gmail.com",
                 web: "https://sites.google.com/view/c-l-csoluciones/",
-                logo: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
+                logo: "" // Vacío para que el usuario lo suba
             }
         ];
 
-        // Variables globales
         let usuarioActual = null;
         let empresaActual = null;
         let numeroCotizacion = 1;
+        let ivaActivo = true; // IVA activado por defecto
     </script>
 
     <!-- ==============================================
@@ -83,120 +84,141 @@
     </div>
 
     <!-- ==============================================
-        📄 PANTALLA PRINCIPAL DEL COTIZADOR
+        📄 PANTALLA PRINCIPAL
     ============================================== -->
     <div id="pantallaPrincipal" class="max-w-4xl mx-auto oculto">
-        <!-- Encabezado -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
+        <!-- OPCIÓN PARA SUBIR LOGO -->
+        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+            <label class="block text-gray-700 mb-2 font-semibold">📤 Subir logo de la empresa:</label>
+            <input type="file" id="logoInput" accept="image/*" class="w-full text-sm" onchange="cargarLogo(this)">
+        </div>
+
+        <!-- ENCABEZADO PROFESIONAL -->
+        <div id="contenidoCotizacion" class="bg-white p-8 rounded-lg shadow-md mb-6 pdf-estilo">
+            <div class="flex flex-col md:flex-row justify-between items-start border-b pb-6 mb-6">
                 <div class="flex items-center mb-4 md:mb-0">
-                    <img id="logoEmpresa" src="" alt="Logo" class="h-16 mr-4">
+                    <img id="logoEmpresa" src="" alt="Logo Empresa" class="h-20 mr-4 object-contain border p-1" style="max-width: 150px;">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-800" id="nombreEmpresa"></h1>
+                        <h1 class="text-3xl font-bold text-gray-800" id="nombreEmpresa"></h1>
                         <p class="text-gray-600" id="nitEmpresa"></p>
                         <p class="text-gray-600" id="direccionEmpresa"></p>
+                        <p class="text-gray-600" id="telefonoEmpresa"></p>
+                        <p class="text-gray-600" id="correoEmpresa"></p>
+                        <p class="text-gray-600" id="webEmpresa"></p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-gray-600" id="telefonoEmpresa"></p>
-                    <p class="text-gray-600" id="correoEmpresa"></p>
-                    <p class="text-gray-600" id="webEmpresa"></p>
-                    <p class="mt-2 font-semibold">Cotización N° <span id="numCotizacion"></span></p>
-                    <p class="text-sm text-gray-500">Fecha: <span id="fechaActual"></span></p>
-                    <button onclick="cerrarSesion()" class="mt-2 text-sm text-red-600 hover:text-red-800">Cerrar sesión</button>
+                <div class="text-right bg-gray-50 p-4 rounded-lg min-w-[200px]">
+                    <h2 class="text-xl font-bold text-blue-700">COTIZACIÓN</h2>
+                    <p class="font-semibold mt-2">N°: <span id="numCotizacion"></span></p>
+                    <p class="text-sm text-gray-600">Fecha: <span id="fechaActual"></span></p>
+                    <p class="text-sm text-gray-600">Vigencia: 15 días hábiles</p>
                 </div>
             </div>
-        </div>
 
-        <!-- Datos del Cliente -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h3 class="text-xl font-semibold mb-4 text-gray-800">Datos del Cliente</h3>
-            <div class="grid md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-gray-700 mb-1">Nombre completo / Empresa</label>
-                    <input type="text" id="clienteNombre" class="w-full px-3 py-2 border rounded-lg" placeholder="Nombre del cliente">
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-1">NIT / Cédula</label>
-                    <input type="text" id="clienteDocumento" class="w-full px-3 py-2 border rounded-lg" placeholder="NIT o cédula">
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-1">Teléfono</label>
-                    <input type="text" id="clienteTelefono" class="w-full px-3 py-2 border rounded-lg" placeholder="Teléfono">
-                </div>
-                <div>
-                    <label class="block text-gray-700 mb-1">Correo electrónico</label>
-                    <input type="email" id="clienteCorreo" class="w-full px-3 py-2 border rounded-lg" placeholder="correo@ejemplo.com">
-                </div>
-                <div class="md:col-span-2">
-                    <label class="block text-gray-700 mb-1">Dirección</label>
-                    <input type="text" id="clienteDireccion" class="w-full px-3 py-2 border rounded-lg" placeholder="Dirección completa">
+            <!-- DATOS DEL CLIENTE -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 border-l-4 border-blue-600 pl-2">DATOS DEL CLIENTE</h3>
+                <div class="grid md:grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-medium">Nombre / Empresa:</label>
+                        <input type="text" id="clienteNombre" class="w-full px-3 py-2 border rounded" placeholder="Nombre completo">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-medium">NIT / Cédula:</label>
+                        <input type="text" id="clienteDocumento" class="w-full px-3 py-2 border rounded" placeholder="Documento de identidad">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-medium">Teléfono:</label>
+                        <input type="text" id="clienteTelefono" class="w-full px-3 py-2 border rounded" placeholder="Teléfono de contacto">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-1 font-medium">Correo:</label>
+                        <input type="email" id="clienteCorreo" class="w-full px-3 py-2 border rounded" placeholder="correo@ejemplo.com">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-gray-700 mb-1 font-medium">Dirección:</label>
+                        <input type="text" id="clienteDireccion" class="w-full px-3 py-2 border rounded" placeholder="Dirección completa">
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Productos / Servicios -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h3 class="text-xl font-semibold mb-4 text-gray-800">Productos / Servicios</h3>
-            
-            <div class="overflow-x-auto">
-                <table class="w-full mb-4">
-                    <thead>
-                        <tr class="bg-gray-100">
-                            <th class="py-2 px-3 text-left">Descripción</th>
-                            <th class="py-2 px-3 text-center">Cantidad</th>
-                            <th class="py-2 px-3 text-right">Valor Unitario</th>
-                            <th class="py-2 px-3 text-right">Valor Total</th>
-                            <th class="py-2 px-3 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="listaItems"></tbody>
-                </table>
+            <!-- TABLA DE PRODUCTOS -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-3 border-l-4 border-blue-600 pl-2">PRODUCTOS Y SERVICIOS</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse">
+                        <thead>
+                            <tr class="bg-blue-600 text-white">
+                                <th class="py-3 px-4 text-left">Descripción</th>
+                                <th class="py-3 px-4 text-center">Cantidad</th>
+                                <th class="py-3 px-4 text-right">Valor Unitario</th>
+                                <th class="py-3 px-4 text-right">Valor Total</th>
+                                <th class="py-3 px-4 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="listaItems" class="border border-gray-200"></tbody>
+                    </table>
+                </div>
+                <button onclick="agregarItem()" class="mt-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition">
+                    + Agregar ítem
+                </button>
             </div>
 
-            <button onclick="agregarItem()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition duration-300">
-                + Agregar ítem
-            </button>
+            <!-- ✅ OPCIÓN ACTIVAR/DESACTIVAR IVA -->
+            <div class="mb-4 flex items-center justify-end">
+                <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" id="activarIVA" checked onchange="calcularTotales()" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <span class="ml-2 text-gray-700 font-medium">Aplicar IVA (19%)</span>
+                </label>
+            </div>
 
-            <!-- Totales -->
-            <div class="mt-6 border-t pt-4">
-                <div class="flex justify-between items-center text-lg">
-                    <span class="font-semibold">Subtotal:</span>
-                    <span id="subtotal" class="font-semibold">$ 0</span>
-                </div>
-                <div class="flex justify-between items-center text-lg mt-2">
-                    <span class="font-semibold">IVA (19%):</span>
-                    <span id="iva" class="font-semibold">$ 0</span>
-                </div>
-                <div class="flex justify-between items-center text-xl font-bold mt-3 text-blue-700">
-                    <span>TOTAL:</span>
-                    <span id="total">$ 0</span>
+            <!-- TOTALES -->
+            <div class="flex justify-end mb-6">
+                <div class="w-full md:w-1/2">
+                    <div class="border-t border-b border-gray-300 py-3">
+                        <div class="flex justify-between items-center py-1">
+                            <span class="font-medium">Subtotal:</span>
+                            <span id="subtotal" class="font-semibold">$ 0</span>
+                        </div>
+                        <div id="filaIVA" class="flex justify-between items-center py-1">
+                            <span class="font-medium">IVA (19%):</span>
+                            <span id="iva" class="font-semibold">$ 0</span>
+                        </div>
+                        <div class="flex justify-between items-center py-3 text-xl font-bold text-blue-700">
+                            <span>TOTAL A PAGAR:</span>
+                            <span id="total">$ 0</span>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Observaciones -->
-        <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-            <h3 class="text-xl font-semibold mb-4 text-gray-800">Observaciones y Términos</h3>
-            <textarea id="observaciones" rows="4" class="w-full px-3 py-2 border rounded-lg" placeholder="Términos y condiciones">• Vigencia de la cotización: 15 días hábiles
+            <!-- OBSERVACIONES -->
+            <div class="mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-2 border-l-4 border-blue-600 pl-2">TÉRMINOS Y CONDICIONES</h3>
+                <textarea id="observaciones" rows="4" class="w-full px-3 py-2 border rounded bg-gray-50" placeholder="Escriba aquí las condiciones...">• Vigencia de la cotización: 15 días hábiles
 • Forma de pago: Contado / Crédito según acuerdo
-• Precios en pesos colombianos
-• Precios sujetos a cambio sin previo aviso</textarea>
+• Precios expresados en Pesos Colombianos (COP)
+• Precios sujetos a cambio sin previo aviso
+• Garantía según condiciones del servicio o producto</textarea>
+            </div>
+
+            <!-- PIE DE PÁGINA -->
+            <div class="text-center text-gray-500 text-sm mt-8 pt-4 border-t">
+                Desarrollado por JD Tecnology 2026
+            </div>
         </div>
 
-        <!-- Botones -->
-        <div class="flex flex-wrap gap-4 justify-center mb-6">
-            <button onclick="generarPDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
-                Descargar PDF
+        <!-- BOTONES DE ACCIÓN -->
+        <div class="flex flex-wrap gap-4 justify-center mb-10">
+            <button onclick="generarPDF()" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold text-lg transition">
+                📄 Generar PDF Profesional
             </button>
-            <button onclick="nuevaCotizacion()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition duration-300">
-                Nueva cotización
+            <button onclick="nuevaCotizacion()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                Nueva Cotización
             </button>
-        </div>
-
-        <!-- 👇 PIE DE PÁGINA AGREGADO -->
-        <div class="text-center text-gray-500 text-sm pb-6">
-            Desarrollado por JD Tecnology 2026
+            <button onclick="cerrarSesion()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition">
+                Cerrar Sesión
+            </button>
         </div>
     </div>
 
@@ -204,6 +226,19 @@
         ⚙️ FUNCIONES
     ============================================== -->
     <script>
+        // Cargar logo desde archivo
+        function cargarLogo(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    empresaActual.logo = e.target.result;
+                    document.getElementById('logoEmpresa').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Iniciar sesión corregido
         function iniciarSesion() {
             const usuario = document.getElementById('usuario').value.trim();
             const clave = document.getElementById('clave').value.trim();
@@ -215,11 +250,10 @@
                 usuarioActual = usuarioEncontrado;
                 empresaActual = EMPRESAS.find(e => e.id === usuarioEncontrado.empresaId);
                 
-                document.getElementById('logoEmpresa').src = empresaActual.logo;
                 document.getElementById('nombreEmpresa').textContent = empresaActual.nombre;
                 document.getElementById('nitEmpresa').textContent = `NIT: ${empresaActual.nit}`;
                 document.getElementById('direccionEmpresa').textContent = empresaActual.direccion;
-                document.getElementById('telefonoEmpresa').textContent = `Tel: ${empresaActual.telefono}`;
+                document.getElementById('telefonoEmpresa').textContent = `Teléfono: ${empresaActual.telefono}`;
                 document.getElementById('correoEmpresa').textContent = `Correo: ${empresaActual.correo}`;
                 document.getElementById('webEmpresa').textContent = `Web: ${empresaActual.web}`;
                 
@@ -254,19 +288,19 @@
         function agregarItem() {
             const tbody = document.getElementById('listaItems');
             const fila = document.createElement('tr');
-            fila.className = 'item-cotizacion border-b';
+            fila.className = 'border-b hover:bg-gray-50';
             fila.innerHTML = `
-                <td class="py-2 px-3">
-                    <input type="text" class="w-full px-2 py-1 border rounded" placeholder="Descripción">
+                <td class="py-3 px-4">
+                    <input type="text" class="w-full px-2 py-1 border rounded" placeholder="Descripción detallada">
                 </td>
-                <td class="py-2 px-3">
+                <td class="py-3 px-4">
                     <input type="number" min="1" value="1" class="w-full px-2 py-1 border rounded text-center" onchange="calcularTotales()">
                 </td>
-                <td class="py-2 px-3">
+                <td class="py-3 px-4">
                     <input type="number" min="0" value="0" class="w-full px-2 py-1 border rounded text-right" onchange="calcularTotales()">
                 </td>
-                <td class="py-2 px-3 text-right font-semibold">$ 0</td>
-                <td class="py-2 px-3 text-center">
+                <td class="py-3 px-4 text-right font-semibold">$ 0</td>
+                <td class="py-3 px-4 text-center">
                     <button onclick="eliminarItem(this)" class="text-red-600 hover:text-red-800 font-bold text-xl">×</button>
                 </td>
             `;
@@ -275,45 +309,71 @@
         }
 
         function eliminarItem(boton) {
-            const filas = document.querySelectorAll('.item-cotizacion');
+            const filas = document.querySelectorAll('#listaItems tr');
             if (filas.length > 1) {
                 boton.closest('tr').remove();
                 calcularTotales();
             } else {
-                alert('Debe haber al menos un ítem');
+                alert('Debe haber al menos un ítem en la cotización');
             }
         }
 
+        // ✅ FUNCIÓN ACTUALIZADA CON IVA OPCIONAL
         function calcularTotales() {
             let subtotal = 0;
-            document.querySelectorAll('.item-cotizacion').forEach(fila => {
+            ivaActivo = document.getElementById('activarIVA').checked;
+
+            document.querySelectorAll('#listaItems tr').forEach(fila => {
                 const cantidad = parseFloat(fila.children[1].querySelector('input').value) || 0;
                 const valorUnitario = parseFloat(fila.children[2].querySelector('input').value) || 0;
                 const total = cantidad * valorUnitario;
                 fila.children[3].textContent = `$ ${total.toLocaleString('es-CO')}`;
                 subtotal += total;
             });
-            const iva = subtotal * 0.19;
+
+            const iva = ivaActivo ? subtotal * 0.19 : 0;
             const totalFinal = subtotal + iva;
+
             document.getElementById('subtotal').textContent = `$ ${subtotal.toLocaleString('es-CO')}`;
-            document.getElementById('iva').textContent = `$ ${iva.toLocaleString('es-CO')}`;
+            
+            // Mostrar u ocultar la fila del IVA
+            if (ivaActivo) {
+                document.getElementById('filaIVA').classList.remove('oculto');
+                document.getElementById('iva').textContent = `$ ${iva.toLocaleString('es-CO')}`;
+            } else {
+                document.getElementById('filaIVA').classList.add('oculto');
+            }
+
             document.getElementById('total').textContent = `$ ${totalFinal.toLocaleString('es-CO')}`;
         }
 
         async function generarPDF() {
             const { jsPDF } = window.jspdf;
-            const elemento = document.getElementById('pantallaPrincipal');
-            const canvas = await html2canvas(elemento, { scale: 2, useCORS: true });
+            const elemento = document.getElementById('contenidoCotizacion');
+            
+            const canvas = await html2canvas(elemento, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            });
+            
             const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            });
+            
             const imgWidth = 210;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-            pdf.save(`Cotizacion_${numeroCotizacion}_CLC_Soluciones.pdf`);
+            pdf.save(`Cotizacion_N${numeroCotizacion}_${empresaActual.nombre.replace(/\s/g, '_')}.pdf`);
         }
 
         function nuevaCotizacion() {
-            if (confirm('¿Crear nueva cotización? Se borrarán los datos actuales.')) {
+            if (confirm('¿Desea crear una nueva cotización? Se borrarán los datos actuales.')) {
                 numeroCotizacion++;
                 document.getElementById('numCotizacion').textContent = numeroCotizacion;
                 document.getElementById('clienteNombre').value = '';
@@ -321,8 +381,9 @@
                 document.getElementById('clienteTelefono').value = '';
                 document.getElementById('clienteCorreo').value = '';
                 document.getElementById('clienteDireccion').value = '';
-                document.getElementById('observaciones').value = '• Vigencia de la cotización: 15 días hábiles\n• Forma de pago: Contado / Crédito según acuerdo\n• Precios en pesos colombianos\n• Precios sujetos a cambio sin previo aviso';
+                document.getElementById('observaciones').value = '• Vigencia de la cotización: 15 días hábiles\n• Forma de pago: Contado / Crédito según acuerdo\n• Precios expresados en Pesos Colombianos (COP)\n• Precios sujetos a cambio sin previo aviso\n• Garantía según condiciones del servicio o producto';
                 document.getElementById('listaItems').innerHTML = '';
+                document.getElementById('activarIVA').checked = true; // Volver a activar IVA por defecto
                 agregarItem();
                 calcularTotales();
                 actualizarFecha();
